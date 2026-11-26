@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: ringlife-backend
+  datasource:
+    # SQLite in WAL (ADR 0004). Il percorso e' configurabile: nell'app HA punta a /data.
+    # I pragma passano dall'URL: valgono per ogni connessione del pool.
+    url: jdbc:sqlite:${RINGLIFE_DB_PATH:./data/ringlife.sqlite}?journal_mode=WAL&foreign_keys=true&busy_timeout=5000&synchronous=NORMAL
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # Una sola scrittura alla volta: pool piccolo, transazioni brevi.
+      maximum-pool-size: 4
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Lo schema lo gestisce solo Flyway.
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8080}
+  # Dietro Tailscale Serve (ADR 0005) il TLS finisce sul proxy: Tomcat legge X-Forwarded-For e X-Forwarded-Proto
+  # solo se la richiesta arriva da un proxy interno (loopback e reti private: il valore predefinito di
+  # `server.tomcat.remoteip.internal-proxies`). Da fuori, quelle intestazioni si ignorano. `framework` sarebbe
+  # meno sicuro: si fiderebbe di chiunque.
+  forward-headers-strategy: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      # Endpoint di salute per il watchdog dell'app HA. Nessun dato sanitario.
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+ringlife:
+  # Segreto per registrare un telefono. Vuoto = registrazione spenta (ADR 0008).
+  pairing-secret: ${RINGLIFE_PAIRING_SECRET:}
+  # MQTT discovery verso Home Assistant (ADR 0011). Host vuoto = spento. Nell'app HA le credenziali arrivano dal Supervisor.
+  mqtt:
+    host: ${MQTT_HOST:}
+    port: ${MQTT_PORT:1883}
+    username: ${MQTT_USERNAME:}
+    password: ${MQTT_PASSWORD:}
+    discovery-prefix: ${MQTT_DISCOVERY_PREFIX:homeassistant}
+  # Pressione atmosferica dal meteo di Home Assistant (ADR 0017). Entita' vuota = spento. Nell'app HA il token e' del Supervisor.
+  weather:
+    entity: ${RINGLIFE_WEATHER_ENTITY:}
+    # Sensore dell'indice UV (ADR 0031). Vuoto = attributo uv_index dell'entita' meteo, se c'e'.
+    uv-entity: ${RINGLIFE_WEATHER_UV_ENTITY:}
+    api-url: ${RINGLIFE_HA_API_URL:http://supervisor/core/api}
+    token: ${SUPERVISOR_TOKEN:}
+  # Push cifrate verso iOS (ADR 0047). Senza chiave, id della chiave o team le push sono spente (fase 1).
+  # La chiave e' il contenuto del file .p8 di Apple, anche su una riga sola: e' un segreto, mai nei log.
+  apns:
+    key: ${RINGLIFE_APNS_KEY:}
+    key-id: ${RINGLIFE_APNS_KEY_ID:}
+    team-id: ${RINGLIFE_APNS_TEAM_ID:}
+    topic: ${RINGLIFE_APNS_TOPIC:com.ringlife.app}

@@ -1,0 +1,48 @@
+# Configurazione gitleaks per RingLife.
+# Regole di base di gitleaks + regole del progetto (vedi CLAUDE.md, sezione "Repository e privacy").
+title = "RingLife gitleaks"
+
+[extend]
+useDefault = true
+
+# --- Regole del progetto: dati che non devono mai entrare nel repo -----------------------
+
+[[rules]]
+id          = "ringlife-mac-address"
+description = "Indirizzo MAC (l'indirizzo dell'anello non entra nel repo)"
+# Sei coppie con lo stesso separatore: un intervallo di orari come 16:19:47-16:20:16 mescola `:` e `-` e non e' un MAC
+# (stessa regola di tools/capture_format.py). RE2 non ha i riferimenti all'indietro: due alternative.
+regex       = '''\b(?:(?:[0-9A-Fa-f]{2}:){5}|(?:[0-9A-Fa-f]{2}-){5})[0-9A-Fa-f]{2}\b'''
+keywords    = [":", "-"]
+
+[[rules]]
+id          = "ringlife-tailnet-hostname"
+description = "Nome host Tailscale (il nome della tailnet non entra nel repo)"
+regex       = '''\b[a-z0-9][a-z0-9-]*\.[a-z0-9][a-z0-9-]*\.ts\.net\b'''
+keywords    = [".ts.net"]
+
+[[rules.allowlists]]
+description = "Segnaposto del campo «indirizzo del server» nell'assistente: non e' una tailnet vera"
+regexes     = ['''ringlife\.tuo-nome\.ts\.net''']
+
+[[rules]]
+id          = "ringlife-private-ipv4"
+description = "Indirizzo IPv4 di rete privata (IP di casa)"
+regex       = '''\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b'''
+keywords    = ["10.", "192.168.", "172."]
+
+# Eccezioni solo per questa regola. Nessuno e' un indirizzo di casa vero.
+[[rules.allowlists]]
+description = "192.168.1.20 e' l'indirizzo di esempio del campo «rete di casa» (segnaposto e test); il test dei confini degli intervalli privati usa indirizzi inventati"
+regexes     = ['''192\.168\.1\.20''']
+paths       = ['''mobile/src/app/settings/settings\.model\.spec\.ts$''']
+
+# --- Eccezioni -----------------------------------------------------------------------------
+
+[allowlist]
+description = "File generati o con identificatori che assomigliano a segreti"
+paths = [
+  '''package-lock\.json$''',
+  '''project\.pbxproj$''',
+  '''\.gitleaks\.toml$''',
+]

@@ -1,0 +1,101 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px var(--rl-gutter) 40px;
+  color: var(--rl-text);
+}
+
+.intro,
+.empty {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--rl-text-2);
+}
+
+.day {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--rl-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0 12px 12px;
+  border-top: 1px solid var(--rl-line);
+  border-left: 3px solid transparent;
+  color: var(--rl-text);
+  text-decoration: none;
+}
+
+/* Il colore dice solo se c'è da guardare (ADR 0020): ambra per «alto», sempre con l'icona e le parole. */
+.row[data-level='alto'] {
+  border-left-color: var(--rl-warn);
+}
+
+.row[data-level='servizio'] {
+  border-left-color: var(--rl-text-2);
+}
+
+.row.unseen .title {
+  font-weight: 700;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+
+  svg {
+    flex: none;
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: var(--rl-warn);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+}
+
+.body {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--rl-text-2);
+}
+
+.settings {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--rl-text);
+  font-size: 15px;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}

@@ -1,0 +1,146 @@
+:host {
+  display: block;
+}
+
+/* Come gli altri gruppi: filetti, senza riquadro (ADR 0020). Sotto c'è l'elenco, che apre con il suo filetto. */
+.ring-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--rl-line);
+  color: var(--rl-text);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--rl-text-2);
+}
+
+.art {
+  flex: none;
+  width: 76px;
+  height: 76px;
+
+  .inner {
+    fill: var(--rl-surface-2);
+  }
+
+  .hole {
+    fill: var(--rl-bg);
+  }
+
+  .sensor {
+    fill: var(--rl-muted);
+  }
+
+  .band {
+    fill: var(--rl-text);
+  }
+
+  .shine {
+    fill: none;
+    stroke: var(--rl-bg);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.35;
+  }
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rl-line);
+
+  dt {
+    flex: none;
+    font-size: 15px;
+    color: var(--rl-text-2);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  dd.mono {
+    font-family: var(--rl-font-mono);
+    font-size: 14px;
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.action {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: 4px 0 0;
+  padding: 0 20px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  font-weight: 600;
+
+  &:disabled {
+    color: var(--rl-muted);
+  }
+}
+
+.forget {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--rl-text-2);
+  font: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+
+  &:disabled {
+    color: var(--rl-muted);
+  }
+}

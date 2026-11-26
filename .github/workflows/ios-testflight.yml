@@ -1,0 +1,342 @@
+# =============================================================================
+# iOS: build + upload su TestFlight (nessun Mac in locale)
+# =============================================================================
+# Solo trigger manuale: lo chiama il workflow «Rilascio» (release.yml) con la
+# versione appena preparata, oppure si lancia da solo dal tab Actions per una
+# build di prova sulla versione attuale. Motivo: nei repo privati i minuti
+# macOS contano 10 volte (vedi CLAUDE.md, sezione CI). Nessun trigger su push.
+#
+# Dopo l'upload un job Linux scrive le note in «Cosa testare» su TestFlight
+# (scripts/testflight_notes.py, docs/adr/0037): quelle della versione dal
+# CHANGELOG.md, o «Non rilasciata» se ha voci (build di prova).
+#
+# Firma MANUALE: certificato Apple Distribution + App Store provisioning
+# profile, importati in un keychain temporaneo sul runner.
+# Setup one-time: docs/release/DISTRIBUZIONE.md.
+#
+# VARIABILE RICHIESTA (Settings -> Secrets and variables -> Actions -> Variables):
+#   IOS_BUNDLE_ID            Bundle ID dell'app (uguale a quello su App Store
+#                            Connect e a appId in mobile/capacitor.config.ts)
+#
+# SEGRETI RICHIESTI (stessa pagina, tab Secrets):
+#   ASC_API_KEY_ID           ID chiave API App Store Connect (per l'upload)
+#   ASC_API_ISSUER_ID        Issuer ID (UUID)
+#   ASC_API_KEY_P8           File .p8 della chiave API in BASE64
+#   IOS_TEAM_ID              Team ID Apple Developer
+#   IOS_DIST_CERT_P12        Certificato Apple Distribution (.p12) in BASE64
+#   IOS_DIST_CERT_PASSWORD   Password del .p12
+#   IOS_PROVISION_PROFILE    App Store provisioning profile in BASE64
+#   IOS_PROVISION_PROFILE_NOTIFICATIONS  Profilo App Store dell'estensione delle notifiche (BASE64)
+#
+# Nessun dato sanitario in CI: la build non usa fixture reali.
+name: iOS TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versione marketing (es. 0.2.0). Vuoto = usa mobile/package.json, cioe' l'ultima rilasciata"
+        required: false
+        default: ""
+      runner:
+        description: "Immagine macOS. macos-15 ha Xcode 26 accanto a quello di default: alternativa se macos-26 e' in coda a lungo."
+        type: choice
+        options: [macos-26, macos-15]
+        default: macos-26
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      runner:
+        type: string
+        required: false
+        default: macos-26
+      ref:
+        description: "Tag da costruire, per esempio v0.2.0"
+        type: string
+        required: true
+
+jobs:
+  build-and-upload:
+    # App Store Connect rifiuta upload compilati con SDK precedenti a iOS 26 (da aprile 2026),
+    # e da aprile 2027 quelli precedenti a iOS 27 (avviso ITMS-90725): serve Xcode 26, poi 27.
+    # Il passo «Seleziona Xcode» prende il piu' recente installato sul runner.
+    # Se macos-26 resta in coda per capacita', rilanciare con runner = macos-15.
+    runs-on: ${{ inputs.runner || 'macos-26' }}
+    timeout-minutes: 45
+    concurrency:
+      group: ios-testflight
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      build: ${{ steps.ver.outputs.build }}
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Vuoto quando si lancia a mano: il commit scelto nel tab Actions.
+          ref: ${{ inputs.ref || '' }}
+
+      # L'Xcode stabile piu' recente installato sul runner, mai una beta o una release candidate
+      # (App Store Connect rifiuta le beta). Da aprile 2027 serve l'SDK di iOS 27, cioe' Xcode 27
+      # (avviso ITMS-90725 sulla build 36): appena GitHub lo mette sull'immagine, questo passo lo
+      # sceglie da solo. Prima di allora resta il piu' recente Xcode 26, con un avviso.
+      - name: Seleziona Xcode
+        run: |
+          echo "Xcode installati:"
+          ls -d /Applications/Xcode*.app 2>/dev/null || true
+          # Solo versioni numeriche (Xcode_26.5.app, Xcode_27.0.1.app): esclude beta e release candidate.
+          latest="$(ls -d /Applications/Xcode_*.app 2>/dev/null \
+            | sed -E 's#^.*/Xcode_(.*)\.app$#\1#' \
+            | grep -E '^[0-9]+(\.[0-9]+)*$' \
+            | sort -t. -k1,1n -k2,2n -k3,3n \
+            | tail -1)"
+          if [ -n "$latest" ]; then
+            sudo xcode-select -s "/Applications/Xcode_${latest}.app/Contents/Developer"
+          fi
+          major="$(xcodebuild -version | head -1 | awk '{print $2}' | cut -d. -f1)"
+          if [ "$major" -lt 26 ]; then
+            echo "::error::Serve Xcode 26 o successivo, e su questo runner non c'e': usa l'immagine macos-26."
+            exit 1
+          fi
+          if [ "$major" -lt 27 ]; then
+            echo "::warning::Build con Xcode $major: da aprile 2027 App Store Connect accetta solo build fatte con Xcode 27 o successivo (ITMS-90725)."
+          fi
+          xcodebuild -version
+
+      # Fallisce subito e con un messaggio chiaro se il progetto Capacitor iOS
+      # non esiste ancora (scaffolding mobile/ non fatto): evita di consumare
+      # minuti macOS per niente.
+      - name: Verifica progetto iOS
+        env:
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+        run: |
+          if [ -z "$BUNDLE_ID" ]; then
+            echo "::error::Variabile IOS_BUNDLE_ID mancante (vedi docs/release/DISTRIBUZIONE.md)"
+            exit 1
+          fi
+          if [ ! -d ios/App/App.xcodeproj ]; then
+            echo "::error::mobile/ios/App/App.xcodeproj non trovato: il progetto Ionic/Capacitor iOS non e' ancora stato creato."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Installa dipendenze
+        run: npm ci
+
+      - name: Risolvi versione marketing
+        id: ver
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          # Apple legge CFBundleShortVersionString come interi separati da punto:
+          # accetta solo X.Y o X.Y.Z senza zeri iniziali.
+          if ! echo "$VERSION" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))?$'; then
+            echo "::error::Versione '$VERSION' non valida (atteso 0.1.0 / 1.0 / 1.2.3)"
+            exit 1
+          fi
+          # Build number: anno, giorno dell'anno, ora e minuto in UTC (263271034 = 2026, giorno 327, 10:34). Cresce
+          # sempre, qualunque workflow faccia la build (docs/adr/0037), e resta sotto 2^31 fino al 2099.
+          BUILD="$(date -u +%y%j%H%M)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "Versione marketing: $VERSION, build $BUILD"
+
+      - name: Build web (production)
+        run: npx ng build --configuration production
+
+      - name: Capacitor sync iOS
+        run: npx cap sync ios
+
+      # Risoluzione pacchetti SPM isolata e ritentabile: xcodebuild risolve le
+      # dipendenze Swift con clone git concorrenti e puo' fallire per flakiness
+      # di rete. Meglio ritentare qui che rifare archive + firma + export.
+      - name: Risolvi dipendenze SPM (con retry)
+        run: |
+          for i in 1 2 3; do
+            echo "Tentativo $i di risoluzione pacchetti SPM..."
+            if xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App; then
+              echo "Risoluzione pacchetti riuscita."
+              exit 0
+            fi
+            echo "::warning::Tentativo $i fallito (probabile flakiness SPM). Ritento tra 15s..."
+            sleep 15
+          done
+          echo "::error::Risoluzione dipendenze SPM fallita dopo 3 tentativi."
+          exit 1
+
+      - name: Prepara chiave API App Store Connect (upload)
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+        run: |
+          mkdir -p ~/private_keys
+          echo "$ASC_API_KEY_P8" | base64 --decode > ~/private_keys/AuthKey_${ASC_API_KEY_ID}.p8
+
+      # Firma manuale: importa il certificato Distribution in un keychain
+      # temporaneo e installa il provisioning profile. Esporta su $GITHUB_ENV
+      # nome e UUID del profilo (servono ad archive ed export).
+      - name: Setup firma (certificato + profilo)
+        env:
+          IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+          IOS_PROVISION_PROFILE_NOTIFICATIONS: ${{ secrets.IOS_PROVISION_PROFILE_NOTIFICATIONS }}
+        run: |
+          set -e
+          if [ -z "$IOS_DIST_CERT_P12" ] || [ -z "$IOS_PROVISION_PROFILE" ] || [ -z "$IOS_PROVISION_PROFILE_NOTIFICATIONS" ]; then
+            echo "::error::Secret di firma mancanti (IOS_DIST_CERT_P12 / IOS_PROVISION_PROFILE / IOS_PROVISION_PROFILE_NOTIFICATIONS). Vedi docs/release/DISTRIBUZIONE.md e docs/release/PUSH-CIFRATE.md"
+            exit 1
+          fi
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PASS="$(openssl rand -base64 16)"
+          security create-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN_PATH"
+
+          echo "$IOS_DIST_CERT_P12" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          security import "$RUNNER_TEMP/dist.p12" -P "$IOS_DIST_CERT_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASS" "$KEYCHAIN_PATH" >/dev/null
+
+          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILES_DIR"
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > "$RUNNER_TEMP/pp.mobileprovision"
+          PLIST="$(security cms -D -i "$RUNNER_TEMP/pp.mobileprovision")"
+          PROFILE_UUID="$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< "$PLIST")"
+          PROFILE_NAME="$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< "$PLIST")"
+          cp "$RUNNER_TEMP/pp.mobileprovision" "$PROFILES_DIR/$PROFILE_UUID.mobileprovision"
+
+          echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+          echo "PROFILE_UUID=$PROFILE_UUID" >> "$GITHUB_ENV"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
+          echo "Profilo installato: $PROFILE_NAME ($PROFILE_UUID)"
+
+          # Secondo profilo: estensione delle notifiche (docs/release/PUSH-CIFRATE.md).
+          echo "$IOS_PROVISION_PROFILE_NOTIFICATIONS" | base64 --decode > "$RUNNER_TEMP/pp-notifications.mobileprovision"
+          PLIST_N="$(security cms -D -i "$RUNNER_TEMP/pp-notifications.mobileprovision")"
+          PROFILE_UUID_N="$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< "$PLIST_N")"
+          PROFILE_NAME_N="$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<< "$PLIST_N")"
+          cp "$RUNNER_TEMP/pp-notifications.mobileprovision" "$PROFILES_DIR/$PROFILE_UUID_N.mobileprovision"
+          echo "PROFILE_NAME_NOTIFICATIONS=$PROFILE_NAME_N" >> "$GITHUB_ENV"
+          echo "Profilo installato: $PROFILE_NAME_N ($PROFILE_UUID_N)"
+
+      # Build number unico per TestFlight: dal passo «Risolvi versione marketing».
+      - name: Imposta build number
+        run: cd ios/App && xcrun agvtool new-version -all ${{ steps.ver.outputs.build }}
+
+      # Applica la firma manuale ai soli target App e RingLifeNotifications (config Release) nel
+      # project.pbxproj. Passate da riga di comando, le impostazioni di firma si
+      # applicherebbero anche ai target SPM (resource bundle), che non supportano
+      # i profili. Il progetto committato resta con firma automatica.
+      - name: Applica firma manuale ai target App ed estensione
+        env:
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+        run: |
+          python3 scripts/apply-ios-signing.py ios/App/App.xcodeproj/project.pbxproj "$IOS_TEAM_ID" \
+            "$BUNDLE_ID=$PROFILE_NAME" \
+            "$BUNDLE_ID.notifications=$PROFILE_NAME_NOTIFICATIONS"
+
+      # Archive con firma manuale Distribution (impostata dal passo precedente).
+      # Da riga di comando si passano solo team, keychain e versione.
+      - name: Archive (firma manuale Distribution)
+        env:
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          MARKETING_VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath build/App.xcarchive \
+            MARKETING_VERSION="$MARKETING_VERSION" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
+            DEVELOPMENT_TEAM="$IOS_TEAM_ID"
+
+      # Export con firma manuale + upload diretto su TestFlight (chiave API).
+      - name: Export e upload su TestFlight
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+        run: |
+          cat > build/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${IOS_TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key><string>${PROFILE_NAME}</string>
+              <key>${BUNDLE_ID}.notifications</key><string>${PROFILE_NAME_NOTIFICATIONS}</string>
+            </dict>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist build/ExportOptions.plist \
+            -exportPath build/export \
+            -authenticationKeyPath ~/private_keys/AuthKey_${ASC_API_KEY_ID}.p8 \
+            -authenticationKeyID "$ASC_API_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+
+      # Rimuove keychain, certificato e chiave API dal runner anche se un passo
+      # precedente e' fallito.
+      - name: Pulizia segreti dal runner
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/dist.p12" "$RUNNER_TEMP/pp.mobileprovision" "$RUNNER_TEMP/pp-notifications.mobileprovision"
+          rm -rf ~/private_keys
+
+  # Le note della build in «Cosa testare» su TestFlight. Su Linux: aspettare che Apple elabori la build su un runner
+  # macOS costerebbe dieci volte tanto. Se non riesce, la build resta su TestFlight senza note.
+  notes:
+    needs: build-and-upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
+      - name: Scrivi «Cosa testare»
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+          VERSION: ${{ needs.build-and-upload.outputs.version }}
+          BUILD: ${{ needs.build-and-upload.outputs.build }}
+        run: |
+          python3 -m pip install --quiet cryptography
+          python3 scripts/release.py build-notes "$VERSION" > "$RUNNER_TEMP/note.txt"
+          python3 scripts/testflight_notes.py --bundle-id "$BUNDLE_ID" --version "$VERSION" --build "$BUILD" \
+            --notes-file "$RUNNER_TEMP/note.txt"

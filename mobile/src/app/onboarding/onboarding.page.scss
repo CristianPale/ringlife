@@ -1,0 +1,130 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: calc(var(--ion-safe-area-top, 0px) + 16px) var(--rl-gutter) calc(var(--ion-safe-area-bottom, 0px) + 32px);
+  color: var(--rl-text);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+}
+
+.progress {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rl-muted);
+}
+
+h1 {
+  margin: 8px 0 0;
+  font-family: var(--rl-font-voice);
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 500;
+}
+
+h2 {
+  margin: 16px 0 0;
+  font-family: var(--rl-font-voice);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 500;
+}
+
+p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--rl-text-2);
+}
+
+.notice {
+  padding: 12px 0;
+  border-top: 1px solid var(--rl-line);
+  border-bottom: 1px solid var(--rl-line);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.center {
+  text-align: center;
+}
+
+.ok {
+  color: var(--rl-ok-text);
+}
+
+.error {
+  color: var(--rl-warn);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 14px;
+  color: var(--rl-text-2);
+}
+
+input,
+select {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: var(--rl-surface);
+  color: var(--rl-text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  font-weight: 600;
+
+  &:disabled {
+    color: var(--rl-muted);
+    opacity: 0.6;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+
+  .primary {
+    margin-left: auto;
+    border-color: transparent;
+    background: var(--rl-surface-2);
+  }
+}

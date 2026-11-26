@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+.sheet {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px var(--rl-gutter) 34px;
+  background: var(--rl-surface);
+  color: var(--rl-text);
+}
+
+/* Il maniglione dello sheet. */
+.sheet::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 36px;
+  height: 4px;
+  margin-left: -18px;
+  border-radius: 2px;
+  background: var(--rl-usual);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+  }
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.option {
+  min-height: 64px;
+  border: 0;
+  border-radius: var(--rl-radius-control);
+  background: var(--rl-surface-2);
+  color: var(--rl-text);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--rl-text-2);
+}
+
+.cancel {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--rl-text-2);
+  font: inherit;
+  font-size: 15px;
+}

@@ -1,0 +1,83 @@
+# Builds the server image of the Home Assistant app and pushes it to GitHub Container Registry, so that Home Assistant
+# installs the app from this repository without building it on the device (`image` in ha-app/ringlife/config.yaml).
+# Runs on every version tag pushed to this repository, or by hand with a tag.
+#
+# After the first push the package is private: open the package settings on GitHub (Packages > ringlife >
+# Package settings > Change visibility) and make it public once, or Home Assistant cannot pull it.
+# No real data in CI.
+name: HA app image
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Version tag to build, for example v1.0.0"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ha-image-${{ inputs.ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+      - name: Version and image name
+        id: meta
+        env:
+          REF: ${{ inputs.ref || github.ref_name }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          version="${REF#v}"
+          image="ghcr.io/${OWNER,,}/ringlife"
+          # The tag, config.yaml and the image name must agree: Home Assistant pulls <image>:<version>.
+          grep -q "^version: \"${version}\"" ha-app/ringlife/config.yaml \
+            || { echo "::error::config.yaml has not version ${version}"; exit 1; }
+          grep -q "^image: \"${image}\"" ha-app/ringlife/config.yaml \
+            || { echo "::error::config.yaml must say image: \"${image}\" (change it in a fork)"; exit 1; }
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+      - name: App package (jar, start script, licenses)
+        run: sh scripts/package-ha-app.sh build/ha-app/ringlife
+      - name: Log in to GitHub Container Registry
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
+        run: echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+      - name: Build and push
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          IMAGE: ${{ steps.meta.outputs.image }}
+          SOURCE: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          docker buildx build build/ha-app/ringlife \
+            --platform linux/amd64 \
+            --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base-debian:trixie \
+            --label "org.opencontainers.image.source=${SOURCE}" \
+            --label "org.opencontainers.image.version=${VERSION}" \
+            --label "org.opencontainers.image.licenses=Apache-2.0" \
+            --label "org.opencontainers.image.title=RingLife" \
+            --label "io.hass.type=addon" \
+            --label "io.hass.version=${VERSION}" \
+            --label "io.hass.arch=amd64" \
+            --label "io.hass.name=RingLife" \
+            --tag "${IMAGE}:${VERSION}" \
+            --push
+          echo "Pushed ${IMAGE}:${VERSION}"
+      - name: Log out
+        if: always()
+        run: docker logout ghcr.io

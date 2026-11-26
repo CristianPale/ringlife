@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android non sa limitare il traffico in chiaro a un intervallo di indirizzi: il permesso vale per tutta l'app.
+  Il limite alle sole reti di casa lo impone il codice (normalizeHomeUrl in settings.model.ts): l'unico indirizzo in
+  HTTP che l'app accetta e' un IPv4 privato o un nome .local. Vedi docs/adr/0012.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

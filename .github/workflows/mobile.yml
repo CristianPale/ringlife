@@ -1,0 +1,31 @@
+# Build e test dell'app mobile (web) su runner Linux. Nessun dato reale in CI.
+name: Mobile
+
+on:
+  push:
+    branches: [main]
+    paths: ['mobile/**', '.github/workflows/mobile.yml']
+  pull_request:
+    paths: ['mobile/**', '.github/workflows/mobile.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npx ng build --configuration production
+      - run: npx ng test --watch=false
+      - name: Test script firma iOS
+        run: python3 -m unittest scripts/test_apply_ios_signing.py

@@ -1,0 +1,272 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 8px var(--rl-gutter) 40px;
+  color: var(--rl-text);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--rl-font-voice);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 500;
+}
+
+h2 {
+  margin: 8px 0 0;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  font-weight: 500;
+}
+
+p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--rl-text-2);
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--rl-muted);
+}
+
+.error {
+  color: var(--rl-warn);
+}
+
+.wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+}
+
+.breath {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 8px;
+}
+
+.circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 2px solid var(--rl-text-2);
+  background: var(--rl-usual);
+  transition: transform 100ms linear;
+}
+
+.phase {
+  font-family: var(--rl-font-voice);
+  font-size: 26px;
+  color: var(--rl-text);
+
+  .count {
+    font-family: var(--rl-font-mono);
+    color: var(--rl-text-2);
+  }
+}
+
+.reading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bpm {
+  font-family: var(--rl-font-mono);
+  font-size: 72px;
+  line-height: 1;
+  color: var(--rl-text);
+}
+
+.unit {
+  font-size: 14px;
+  color: var(--rl-text-2);
+}
+
+.elapsed {
+  text-align: center;
+  font-family: var(--rl-font-mono);
+  font-size: 18px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+
+  div {
+    padding: 8px 0;
+    border-top: 1px solid var(--rl-line);
+  }
+
+  dt {
+    font-size: 13px;
+    color: var(--rl-text-2);
+  }
+
+  dd {
+    margin: 4px 0 0;
+    font-family: var(--rl-font-mono);
+    font-size: 22px;
+
+    small {
+      font-family: var(--rl-font-ui, inherit);
+      font-size: 12px;
+      color: var(--rl-muted);
+    }
+  }
+}
+
+.chart {
+  width: 100%;
+  height: 80px;
+
+  polyline {
+    fill: none;
+    stroke: var(--rl-text);
+    stroke-width: 1.5;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  align-self: center;
+  min-height: 48px;
+  padding: 0 28px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: 24px;
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.button.primary {
+  border-color: transparent;
+  background: var(--rl-surface-2);
+}
+
+.disclaimer {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+/* Zona attuale del battito (docs/adr/0028): parole e una striscia di cinque tratti, senza colori di dominio. */
+.zone-now {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zone-label {
+  font-size: 16px;
+  color: var(--rl-text);
+}
+
+.zone-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+
+  span {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--rl-surface-2);
+  }
+
+  span.is-on {
+    background: var(--rl-text);
+  }
+}
+
+/* Allenamento (docs/adr/0042): scelte prima di iniziare. */
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.choice-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rl-text);
+}
+
+.activity {
+  text-align: center;
+  font-size: 15px;
+  color: var(--rl-text-2);
+}
+
+.paused {
+  font-family: var(--rl-font-voice);
+  font-size: 32px;
+  line-height: 72px;
+  color: var(--rl-text-2);
+}
+
+/* La zona obiettivo: un bordo sul tratto, così si vede anche quando non è quella attuale. */
+.zone-strip span.is-target {
+  outline: 2px solid var(--rl-text-2);
+  outline-offset: 2px;
+}
+
+/* Fuori dalla zona obiettivo: ambra, sempre con l'icona e le parole (ADR 0020). */
+.target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  color: var(--rl-text);
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+}
+
+.target[data-tone='peggio'] {
+  color: var(--rl-warn);
+}
+
+.recovery {
+  color: var(--rl-text);
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.stats dd.word {
+  font-family: var(--rl-font-text);
+  font-size: 18px;
+}

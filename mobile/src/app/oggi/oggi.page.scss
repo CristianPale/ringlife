@@ -1,0 +1,519 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  /* Area sicura: sotto la tacca e l'ora di sistema (viewport-fit=cover). */
+  padding: calc(var(--ion-safe-area-top, 0px) + 8px) var(--rl-gutter) 104px;
+  color: var(--rl-text);
+}
+
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.date {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--rl-text-2);
+}
+
+.sync {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.server-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* La campanella degli avvisi (docs/adr/0045): 44 px di tocco, il numero dei non visti in un tondo. */
+.bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--rl-text-2);
+
+  svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+  }
+}
+
+.bell-count {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--rl-text);
+  color: var(--rl-bg);
+  font-family: var(--rl-font-mono);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.ring-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 0 0 12px;
+  color: var(--rl-text-2);
+  font-family: var(--rl-font-mono);
+  font-size: 13px;
+  text-decoration: none;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke: none;
+  }
+
+  .ring-arc {
+    fill: none;
+    stroke: var(--rl-text);
+    stroke-width: 2.4;
+  }
+
+  .ring-dot {
+    fill: var(--rl-ok);
+    stroke: none;
+  }
+
+  .battery {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .charging-label {
+    font-family: var(--rl-font-text);
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  /* In carica (ADR 0029): traccia tenue e parte piena fino alla percentuale letta. */
+  .charge-track,
+  .charge-level {
+    fill: none;
+    stroke-width: 2.4;
+  }
+
+  .charge-track {
+    stroke: var(--rl-chip-border);
+  }
+
+  .charge-level {
+    stroke: var(--rl-text);
+    stroke-linecap: round;
+  }
+
+  .charge-bolt {
+    fill: var(--rl-text);
+  }
+}
+
+/* La carica sale: all'apparire si riempie da zero fino alla percentuale letta, poi cresce a ogni lettura. Mai con
+   «riduci movimento»; in Penombra Oggi non si vede. */
+@media (prefers-reduced-motion: no-preference) {
+  .ring-button .charge-level {
+    animation: charge-fill 900ms ease-out;
+    transition: stroke-dashoffset 600ms ease-out;
+  }
+}
+
+@keyframes charge-fill {
+  from {
+    stroke-dashoffset: 55.29;
+  }
+}
+
+/* La prima schermata è solo il giro, centrato nello spazio che resta; il resto compare scorrendo. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Tutta la prima schermata: lo schermo meno aree sicure, intestazione (8 + 44) e barra delle schede (56).
+     Così all'apertura si vede solo il giro e niente fa capolino da sotto. */
+  min-height: calc(100dvh - var(--ion-safe-area-top, 0px) - var(--ion-safe-area-bottom, 0px) - 108px);
+  padding-bottom: 56px;
+  box-sizing: border-box;
+}
+
+/* Intestazione, legenda e Registra arrivano dopo l'apertura del giro (ADR 0020). */
+@media (prefers-reduced-motion: no-preference) {
+  /* Solo durante l'apertura (classe intro, una volta per sessione): dopo non si anima più. */
+  .intro .after-ring {
+    opacity: 0;
+  }
+
+  .intro.ready .after-ring {
+    animation: after-ring 600ms ease-out 1500ms both;
+  }
+
+  /* Registra sta fuori dalla pagina (slot fisso di ion-content): le stesse due fasi, con classi sue. */
+  .register.intro-wait {
+    opacity: 0;
+  }
+
+  .register.intro-play {
+    animation: after-ring 600ms ease-out 1500ms both;
+  }
+}
+
+@keyframes after-ring {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Il giro delle 24 ore: tocco per aprire il dettaglio del Recupero. */
+.giro-link {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  border-radius: 50%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.giro-link app-giro {
+  --giro-size: 340px;
+}
+
+.rest {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.key {
+  display: block;
+  flex: none;
+}
+
+.key-sleep {
+  width: 12px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--rl-stage-light);
+}
+
+.key-usual {
+  box-sizing: border-box;
+  width: 12px;
+  height: 10px;
+  border-left: 2px solid var(--rl-mark);
+  border-right: 2px solid var(--rl-mark);
+  background: var(--rl-usual);
+}
+
+.key-caffeine {
+  width: 12px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rl-text-2);
+}
+
+.key-now {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--rl-ok);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+/* La frase del giorno usa la voce (ADR 0020). */
+.summary-main {
+  margin: 0;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.summary-detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+}
+
+/* Solo le parole che dicono come stai rispetto alla tua media. */
+.summary [data-tone='peggio'] {
+  color: var(--rl-warn);
+}
+
+.summary [data-tone='meglio'] {
+  color: var(--rl-ok-text);
+}
+
+.indices {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.row-link {
+  display: block;
+  border-top: 1px solid var(--rl-line);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Pulsante fisso sopra la barra delle schede (slot «fixed» di ion-content). */
+.index-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.register {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: 24px;
+  background: var(--rl-surface-2);
+  color: var(--rl-text);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
+}
+
+.plugins {
+  margin-top: 36px;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+/* «Per oggi» (docs/adr/0041): una riga per plugin. Il collegamento copre tutta la riga; il pulsante «i» resta sopra. */
+.plugin-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.plugin-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 6px 0;
+  border-top: 1px solid var(--rl-line);
+
+  app-info {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.plugin-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.plugin-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: var(--rl-text);
+  text-decoration: none;
+  text-align: right;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .chevron {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    stroke: var(--rl-muted);
+    stroke-width: 2;
+  }
+}
+
+.plugin-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--rl-font-mono);
+  font-size: 15px;
+  color: var(--rl-text-2);
+
+  .warn {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.6;
+  }
+}
+
+.plugin-value[data-tone='attenzione'] {
+  color: var(--rl-warn);
+}
+
+.disclaimer {
+  margin: 28px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+/* Sheet «Registra»: modale ancorata in basso, alta quanto il contenuto. */
+ion-modal.registra-sheet {
+  --width: 100%;
+  --height: auto;
+  --border-radius: var(--rl-radius-sheet) var(--rl-radius-sheet) 0 0;
+  --background: var(--rl-surface);
+  align-items: flex-end;
+}
+
+/* Conferma dell'ultima voce registrata, sopra la barra delle schede. */
+.undo {
+  position: absolute;
+  left: var(--rl-gutter);
+  right: var(--rl-gutter);
+  bottom: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px 4px 16px;
+  border-radius: var(--rl-radius-control);
+  background: var(--rl-surface-2);
+  color: var(--rl-text);
+  font-size: 15px;
+
+  button {
+    min-height: 44px;
+    padding: 0 8px;
+    border: 0;
+    background: transparent;
+    color: var(--rl-text);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/* Riga senza dati ancora: stesso passo delle altre, solo testo. */
+.row-empty {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--rl-muted);
+
+  .name {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--rl-text);
+  }
+}
+
+/* Finché la tua media non è pronta: dice che i numeri sono provvisori. Sparisce da sola. */
+.calibration {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-warn);
+}
+
+/* Stanotte: le misure del corpo, con la stessa livella delle righe. Tocco: apre Sonno. */

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Hook di pre-commit: cerca segreti e dati privati nei file in staging con gitleaks.
+# Attivazione (una volta per clone): sh scripts/setup-hooks.sh
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks non trovato, commit bloccato." >&2
+  echo "Installa gitleaks e riprova:" >&2
+  echo "  Windows: winget install Gitleaks.Gitleaks" >&2
+  echo "  macOS:   brew install gitleaks" >&2
+  echo "  Linux:   https://github.com/gitleaks/gitleaks#installing" >&2
+  exit 1
+fi
+
+gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  echo "" >&2
+  echo "pre-commit: gitleaks ha trovato un possibile segreto o dato privato." >&2
+  echo "Toglilo dal commit. Se e' un falso positivo, aggiungi la riga 'gitleaks:allow'" >&2
+  echo "come commento sulla riga, oppure un'eccezione in .gitleaks.toml." >&2
+fi
+exit "$status"

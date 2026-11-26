@@ -1,0 +1,6 @@
+# File che girano su Linux (container dell'app HA, hook): sempre LF, anche con un checkout su Windows.
+# Con CRLF la shebang di run.sh diventa "bashio\r" e il container non parte ("unable to exec bashio").
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yaml text eol=lf
+.githooks/* text eol=lf

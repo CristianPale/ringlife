@@ -1,0 +1,58 @@
+/* Token del tema RingLife (colori, font, spazi). */
+@use './theme/variables';
+
+/* Stili core di Ionic. */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+/* Indicatore di focus visibile (WCAG 2.4.7): anello da 2 px. */
+:focus-visible {
+  outline: 2px solid var(--rl-text);
+  outline-offset: 2px;
+}
+
+/* Tasto indietro: solo la freccia, in un'area da 44 px (ADR 0020). */
+ion-back-button {
+  --min-width: 44px;
+  --min-height: 44px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --icon-padding-end: 0;
+  --icon-margin-end: 0;
+  --icon-margin-start: 0;
+  --icon-font-size: 24px;
+  --color: var(--rl-text);
+}
+
+/* Comparsa in dissolvenza scorrendo (direttiva appReveal). Con «riduci movimento» il contenuto è subito visibile. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 600ms ease-out,
+      transform 600ms ease-out;
+  }
+
+  .reveal.revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* La striscia sotto la barra di stato del telefono (area sicura in alto): copre il contenuto che scorre. */
+.status-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--ion-safe-area-top, env(safe-area-inset-top, 0px));
+  background: var(--rl-bg);
+  pointer-events: none;
+}

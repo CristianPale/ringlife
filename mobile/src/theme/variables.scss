@@ -1,0 +1,182 @@
+/*
+ * Token del sistema visivo "Livella" (docs/adr/0020-sistema-visivo-livella.md, docs/design/redesign.md).
+ * Tre temi con gli stessi nomi: Notte (predefinito), Giorno (segue il sistema), Penombra (classe .penombra sul body,
+ * durante un episodio di cefalea).
+ *
+ * Nessun colore di dominio: il colore dice solo come stai rispetto alla tua media (verde nel solito o meglio, ambra
+ * se peggio), sempre con icona e parole accanto. Recupero, Sonno, Movimento e Stress si distinguono per nome.
+ */
+
+:root {
+  --rl-bg: #0e1011;
+  --rl-surface: #171a1b;
+  --rl-surface-2: #1f2324;
+  --rl-bar: #0e1011;
+  --rl-line: #2a2f30;
+  --rl-text: #e9ece8;
+  --rl-text-2: #aab1ad;
+  --rl-muted: #8a918d;
+  /* Bordo delle scelte non attive (pillole, campi). */
+  --rl-chip-border: #3d4546;
+
+  /* La livella: tubo, fascia «il tuo solito», tacche. */
+  --rl-tube: #1f2324;
+  --rl-usual: #3d4546;
+  --rl-mark: #8a918d;
+  /* Le barre delle notti passate (3,5:1 sul fondo): la notte di oggi è in --rl-text. */
+  --rl-past: #626c6e;
+
+  /* Stato rispetto alla tua media. Sempre con icona e parole, mai solo colore. */
+  --rl-ok: #76d3b4;
+  --rl-ok-text: #76d3b4;
+  --rl-warn: #e8ac45;
+  --rl-high: #f08a5d;
+
+  /* Zone fisse e rischio (dettaglio dell'indice, plugin): stessi colori di stato. */
+  --rl-zone-ottimo: var(--rl-ok);
+  --rl-zone-attenzione: var(--rl-warn);
+  --rl-zone-alto: var(--rl-high);
+
+  /* Fasi del sonno: una tinta, più scuro vuol dire più profondo. */
+  --rl-stage-awake: #e9ece8;
+  --rl-stage-rem: #b7d0f7;
+  --rl-stage-light: #6f9be6;
+  --rl-stage-deep: #3563c9;
+
+  /* Il punto del logo: stesso verde del marchio, più scuro sul chiaro per il contrasto. */
+  --rl-logo-dot: #76d3b4;
+
+  /* Forme e spazi (base 4). */
+  --rl-radius-control: 12px;
+  --rl-radius-tile: 14px;
+  --rl-radius-card: 14px;
+  --rl-radius-sheet: 20px;
+  --rl-gutter: 24px;
+  --rl-section-gap: 28px;
+
+  /* Tre voci di sistema, nessun font da caricare (nessuna rete sotto Ingress):
+     Voce (frase del giorno, titoli, esiti dei plugin), Testo (etichette, pulsanti), Misura (ogni valore misurato). */
+  --rl-font-voice: ui-serif, 'New York', Georgia, 'Times New Roman', serif;
+  --rl-font-text: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --rl-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --rl-font-numbers: var(--rl-font-mono);
+}
+
+/* Insiemi di token che cambiano tra tema scuro e chiaro. Il tema scuro è il predefinito su :root. */
+@mixin theme-dark {
+  --rl-logo-dot: #76d3b4;
+  --rl-bg: #0e1011;
+  --rl-surface: #171a1b;
+  --rl-surface-2: #1f2324;
+  --rl-bar: #0e1011;
+  --rl-line: #2a2f30;
+  --rl-text: #e9ece8;
+  --rl-text-2: #aab1ad;
+  --rl-muted: #8a918d;
+  --rl-chip-border: #3d4546;
+
+  --rl-tube: #1f2324;
+  --rl-usual: #3d4546;
+  --rl-mark: #8a918d;
+  --rl-past: #626c6e;
+
+  --rl-ok: #76d3b4;
+  --rl-ok-text: #76d3b4;
+  --rl-warn: #e8ac45;
+  --rl-high: #f08a5d;
+
+  --rl-stage-awake: #e9ece8;
+  --rl-stage-rem: #b7d0f7;
+  --rl-stage-light: #6f9be6;
+  --rl-stage-deep: #3563c9;
+}
+
+@mixin theme-light {
+  --rl-logo-dot: #1e8469;
+  --rl-bg: #f2f3ef;
+  --rl-surface: #ffffff;
+  --rl-surface-2: #e3e6e0;
+  --rl-bar: #f2f3ef;
+  --rl-line: #dcdfd9;
+  --rl-text: #15181a;
+  --rl-text-2: #4d5552;
+  --rl-muted: #646c68;
+  --rl-chip-border: #c3c9c3;
+
+  --rl-tube: #e3e6e0;
+  --rl-usual: #c3c9c3;
+  --rl-mark: #646c68;
+  --rl-past: #7a827e;
+
+  /* Contrasto sullo sfondo chiaro #f2f3ef: bolla 4,8:1, ambra 4,9:1, arancio 4,8:1. */
+  --rl-ok: #0c7a5b;
+  --rl-ok-text: #0c7a5b;
+  --rl-warn: #9a5a00;
+  --rl-high: #b8461a;
+
+  --rl-stage-awake: #646c68;
+  --rl-stage-rem: #5a8cd3;
+  --rl-stage-light: #3f74cc;
+  --rl-stage-deep: #1f3f9a;
+}
+
+/* Tema «Sistema»: segue le impostazioni del telefono. */
+@media (prefers-color-scheme: light) {
+  :root {
+    @include theme-light;
+  }
+}
+
+/* Tema scelto in Impostazioni: vince sul sistema. */
+body.theme-dark {
+  @include theme-dark;
+
+  color-scheme: dark;
+}
+
+body.theme-light {
+  @include theme-light;
+
+  color-scheme: light;
+}
+
+/* Penombra: episodio in corso. Nessuna animazione, nessun colore, contrasto ridotto per non abbagliare. */
+body.penombra {
+  @include theme-dark;
+
+  --rl-bg: #090a0a;
+  --rl-surface: #1f2324;
+  --rl-surface-2: #1f2324;
+  --rl-bar: #090a0a;
+  --rl-line: #2a2f30;
+  --rl-text: #9ea5a0;
+  --rl-text-2: #7f8682;
+  --rl-muted: #7f8682;
+  --rl-chip-border: #2a2f30;
+
+  /* Nessun colore di stato: la Penombra non ne usa, nemmeno per il punto della scheda attiva. */
+  --rl-ok: #7f8682;
+  --rl-ok-text: #7f8682;
+  --rl-warn: #7f8682;
+  --rl-high: #7f8682;
+}
+
+/* Mappa sulle variabili di Ionic. */
+:root,
+body.theme-dark,
+body.theme-light,
+body.penombra {
+  --ion-font-family: var(--rl-font-text);
+  --ion-background-color: var(--rl-bg);
+  --ion-text-color: var(--rl-text);
+  --ion-tab-bar-background: var(--rl-bar);
+  --ion-tab-bar-color: var(--rl-muted);
+  --ion-tab-bar-color-selected: var(--rl-text);
+  --ion-toolbar-background: var(--rl-bg);
+  --ion-toolbar-color: var(--rl-text);
+  --ion-item-background: var(--rl-surface);
+}
+
+:root {
+  color-scheme: dark light;
+}

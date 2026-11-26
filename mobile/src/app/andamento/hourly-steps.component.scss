@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bar {
+  fill: var(--rl-past);
+}
+
+.bar.is-active {
+  fill: var(--rl-text);
+}
+
+.threshold {
+  stroke: var(--rl-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--rl-muted);
+}

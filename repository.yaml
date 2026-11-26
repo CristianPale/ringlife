@@ -1,0 +1,4 @@
+# Home Assistant app repository: add this repository's URL in Home Assistant (Settings > Apps > App store >
+# menu > Repositories). The Supervisor finds the app in ha-app/ringlife and pulls the image built by
+# .github/workflows/ha-image.yml.
+name: RingLife

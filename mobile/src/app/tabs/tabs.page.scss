@@ -1,0 +1,49 @@
+ion-tab-bar {
+  --background: var(--rl-bar);
+  --border: 1px solid var(--rl-line);
+}
+
+ion-tab-button {
+  --color: var(--rl-muted);
+  --color-selected: var(--rl-text);
+  font-size: 11px;
+  font-weight: 500;
+  gap: 3px;
+}
+
+ion-tab-button svg {
+  width: 24px;
+  height: 24px;
+  /* Spazio sopra l'icona per il punto della scheda attiva: non devono toccarsi. */
+  margin-top: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+ion-tab-button.tab-selected {
+  font-weight: 600;
+}
+
+ion-tab-button.tab-selected svg {
+  stroke-width: 1.9;
+}
+
+/* Il punto del logo sulla scheda attiva (ADR 0020). */
+ion-tab-button {
+  position: relative;
+}
+
+ion-tab-button.tab-selected::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--rl-ok);
+}

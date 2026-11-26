@@ -1,0 +1,57 @@
+# App locale di Home Assistant per il backend RingLife (docs/adr/0004, docs/api.md).
+# Lo schema delle opzioni va verificato sulla documentazione sviluppatori corrente ("App configuration"):
+# questo file non e' ancora stato provato su un Supervisor vero.
+name: RingLife
+version: "1.1.0"
+slug: ringlife
+description: Backend personale per l'anello Colmi R09 (indici giornalieri, recupero, sonno)
+arch:
+  - amd64
+# Immagine gia' costruita, per chi installa dal repository pubblico (docs/adr/0038): Home Assistant scarica
+# <image>:<version>, costruita da .github/workflows/ha-image.yml del pubblico. scripts/package-ha-app.sh toglie
+# questa riga: il pacchetto locale si costruisce sul server, come prima.
+image: "ghcr.io/cristianpale/ringlife"
+startup: application
+boot: auto
+init: false
+# Fermata durante il backup di HA: il database SQLite non viene copiato a meta' scrittura.
+backup: cold
+# Riavvio automatico se il backend non risponde. Nessun dato sanitario nell'endpoint di salute.
+watchdog: "http://[HOST]:[PORT:8080]/actuator/health"
+# API del telefono. La porta e' esposta sull'host: raggiungibile da LAN e Tailscale, mai da internet
+# (nessun port forwarding sul router).
+ports:
+  8080/tcp: 8080
+ports_description:
+  8080/tcp: "API del telefono (solo LAN e Tailscale)"
+# Broker MQTT dal Supervisor (app Mosquitto): le entita' di RingLife compaiono in HA via discovery (docs/adr/0011).
+services:
+  - mqtt:need
+# API di Home Assistant tramite il Supervisor: il backend legge la pressione dall'entita' meteo scelta (docs/adr/0017).
+homeassistant_api: true
+options:
+  pairing_secret: ""
+  sleep_goal_minutes: 480
+  steps_goal: 8000
+  timezone: "Europe/Rome"
+  weather_entity: ""
+  uv_entity: ""
+  apns_key: ""
+  apns_key_id: ""
+  apns_team_id: ""
+  apns_topic: ""
+schema:
+  pairing_secret: password?
+  sleep_goal_minutes: int(300,600)
+  steps_goal: int(1000,50000)
+  timezone: str
+  weather_entity: str?
+  uv_entity: str?
+  # Push cifrate verso l'iPhone (docs/adr/0047): chiave APNs .p8 (segreta), il suo id e il team Apple. Vuote = push spente.
+  apns_key: password?
+  apns_key_id: str?
+  apns_team_id: str?
+  # Bundle ID dell'app che riceve le push. Vuoto = com.ringlife.app; serve a chi costruisce l'app con un Bundle ID suo.
+  apns_topic: str?
+# Non ancora richiesti, da aggiungere con le fasi che li usano:
+#   - ingress / panel_icon: dashboard web (fase 6)

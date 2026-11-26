@@ -1,0 +1,226 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-section-gap);
+  padding: 8px var(--rl-gutter) 32px;
+  color: var(--rl-text);
+}
+
+.brand-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+/* Gruppi con filetti, senza riquadro (ADR 0020). */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0 12px;
+  border-top: 1px solid var(--rl-line);
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.ring-status {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.paired {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-zone-alto);
+}
+
+/* «button.button»: Ionic dà la classe `button` anche al tasto indietro, che non deve prendere questo stile. */
+button.button {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: 8px 0 0;
+  padding: 0 20px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  font-weight: 600;
+
+  &:disabled {
+    color: var(--rl-muted);
+  }
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  border-top: 1px solid var(--rl-line);
+
+  &:first-of-type {
+    border-top: 0;
+  }
+}
+
+/* Una caffeina abituale con «Togli» sulla stessa riga (ADR 0036). */
+.field.habit button.button {
+  align-self: center;
+  margin: 0;
+}
+
+.field-label {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+
+.field .field-label {
+  margin: 0;
+}
+
+select,
+input {
+  min-height: 44px;
+  max-width: 55%;
+  padding: 0 12px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: var(--rl-surface-2);
+  color: var(--rl-text);
+  font: inherit;
+  /* Almeno 16 px: sotto questa soglia iOS ingrandisce la pagina quando si tocca il campo. */
+  font-size: 16px;
+  text-align: right;
+}
+
+input[type='url'] {
+  flex: 1;
+  text-align: left;
+}
+
+.footer {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* L'elenco delle sezioni: righe con filetti e un riepilogo, come l'elenco di Impostazioni di iOS. */
+.menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 0;
+  border-top: 1px solid var(--rl-line);
+  color: var(--rl-text);
+  text-decoration: none;
+
+  svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--rl-muted);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.menu-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.menu-title {
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+}
+
+.menu-summary {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+}
+
+/* Un valore letto (non un campo): stesso allineamento dei campi, voce dei numeri. */
+.value {
+  font-family: var(--rl-font-mono);
+  font-size: 15px;
+  color: var(--rl-text-2);
+}
+
+/* Registro dei tentativi in background: righe di testo, la più recente in alto. */
+.attempts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 4px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--rl-text-2);
+  }
+}
+
+/* Il rimando alla Guida sotto l'interruttore di un plugin. */
+.plugin-guide {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: -6px;
+  color: var(--rl-text-2);
+  font-size: 14px;
+}

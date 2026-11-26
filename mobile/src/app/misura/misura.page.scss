@@ -1,0 +1,48 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px var(--rl-gutter) 40px;
+  color: var(--rl-text);
+}
+
+.intro,
+.help,
+.last {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--rl-text-2);
+}
+
+.measure {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rl-line);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+.last {
+  color: var(--rl-text);
+}
+
+.note,
+.disclaimer {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--rl-muted);
+}

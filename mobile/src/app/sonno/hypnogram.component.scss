@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.row-label {
+  font-size: 12px;
+  fill: var(--rl-text-2);
+}
+
+.row-track {
+  fill: var(--rl-surface);
+}
+
+/* Una tinta, più scuro vuol dire più profondo (ADR 0020). La fase si legge anche dalla riga e dall'etichetta. */
+.block[data-stage='awake'] {
+  fill: var(--rl-stage-awake);
+}
+
+.block[data-stage='rem'] {
+  fill: var(--rl-stage-rem);
+}
+
+.block[data-stage='light'] {
+  fill: var(--rl-stage-light);
+}
+
+.block[data-stage='deep'] {
+  fill: var(--rl-stage-deep);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-left: 74px;
+  font-family: var(--rl-font-mono);
+  font-size: 12px;
+  color: var(--rl-muted);
+}

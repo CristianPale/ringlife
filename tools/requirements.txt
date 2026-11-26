@@ -1,0 +1,4 @@
+# Dipendenze dello spike (solo qui, mai nel backend o nell'app). Tutte usate come pacchetti, nessun codice copiato.
+bleak>=0.22
+# Facoltativo, per confrontare un comando con un altro progetto. Licenza da verificare prima di riusarne codice.
+# colmi_r02_client

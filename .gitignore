@@ -1,0 +1,67 @@
+# Real data and BLE captures (never versioned, never in CI)
+local-data/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.db
+
+# Secrets
+.env
+.env.*
+secrets*
+*.pem
+*.key
+*.p12
+*.p8
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+*.jks
+*.keystore
+keystore.properties
+
+# Build output: backend
+target/
+
+# Build output: mobile (web)
+node_modules/
+www/
+dist/
+.angular/
+
+# Build output: Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+.gradle/
+
+# Build output: iOS
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+**/xcuserdata/
+*.xcuserstate
+
+# Python (tools/)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build output: app Home Assistant (scripts/package-ha-app.sh)
+build/

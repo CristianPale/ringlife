@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bar {
+  fill: var(--rl-text);
+  opacity: 0.55;
+}
+
+.bar.is-high {
+  fill: var(--rl-zone-attenzione);
+  opacity: 1;
+}
+
+.empty {
+  stroke: var(--rl-line);
+  stroke-width: 2;
+}
+
+.threshold {
+  stroke: var(--rl-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--rl-muted);
+}

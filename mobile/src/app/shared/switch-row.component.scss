@@ -1,0 +1,73 @@
+:host {
+  display: block;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 16px;
+}
+
+.description {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+}
+
+.track {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  border: 2px solid var(--rl-chip-border);
+  border-radius: 999px;
+  background: var(--rl-surface-2);
+
+  &.on {
+    border-color: var(--rl-text);
+    background: var(--rl-text);
+  }
+}
+
+.thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rl-text-2);
+}
+
+.track.on .thumb {
+  left: 23px;
+  background: var(--rl-bg);
+}
+
+/* Lo stato è anche scritto: l'interruttore non si capisce solo dalla posizione e dal colore. */
+.state {
+  flex-shrink: 0;
+  min-width: 48px;
+  font-size: 13px;
+  color: var(--rl-text-2);
+}

@@ -1,0 +1,109 @@
+:host {
+  --chart-color: var(--rl-text);
+
+  display: block;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.band {
+  fill: var(--rl-surface-2);
+}
+
+.median {
+  stroke: var(--rl-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.line {
+  fill: none;
+  stroke: var(--chart-color);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Fuori fascia: anello ambra vuoto. Il colore da solo non basta, il dominio Movimento ha già un arancio. */
+.dot-out {
+  fill: var(--rl-bg);
+  stroke: var(--rl-zone-attenzione);
+  stroke-width: 2;
+}
+
+.dot-last {
+  fill: var(--chart-color);
+  stroke: var(--rl-bg);
+  stroke-width: 2;
+
+  &.is-out {
+    fill: var(--rl-bg);
+    stroke: var(--rl-zone-attenzione);
+    stroke-width: 2.5;
+  }
+}
+
+/* Lettura al tocco: un cursore verticale e il punto scelto; il riassunto è sotto, in parole. */
+.chart.is-interactive {
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.cursor {
+  stroke: var(--rl-muted);
+  stroke-width: 1;
+}
+
+.dot-picked {
+  fill: var(--rl-bg);
+  stroke: var(--rl-text);
+  stroke-width: 2.5;
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-top: 6px;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--rl-text-2);
+  }
+
+  strong {
+    color: var(--rl-text);
+    font-weight: 600;
+  }
+}
+
+.open {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--rl-chip-border);
+  border-radius: var(--rl-radius-control);
+  background: none;
+  color: var(--rl-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Il riquadro di focus serve a chi usa la tastiera, non a chi tocca. */
+.chart:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.chart:focus-visible {
+  outline: 2px solid var(--rl-text-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

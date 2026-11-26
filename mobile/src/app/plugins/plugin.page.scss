@@ -1,0 +1,238 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-section-gap);
+  padding: 8px var(--rl-gutter) 32px;
+  color: var(--rl-text);
+}
+
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.title {
+  margin: 4px 0 0;
+  font-family: var(--rl-font-voice);
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -12px;
+}
+
+.empty,
+.plain {
+  margin: 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--rl-text-2);
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+.month-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.month-nav {
+  display: flex;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--rl-text);
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:disabled {
+    color: var(--rl-muted);
+    opacity: 0.5;
+  }
+}
+
+.calendar {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+
+  th {
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    color: var(--rl-muted);
+  }
+
+  td {
+    padding: 2px 0;
+  }
+}
+
+/* Il giorno con una cefalea: pieno con un farmaco, vuoto senza. Il numero c'è sempre e lo dice anche il testo nascosto. */
+.day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  font-family: var(--rl-font-mono);
+  font-size: 14px;
+  color: var(--rl-text-2);
+
+  &[data-kind='episode'] {
+    border-color: var(--rl-text);
+    color: var(--rl-text);
+  }
+
+  &[data-kind='medication'] {
+    border-color: var(--rl-text);
+    background: var(--rl-text);
+    color: var(--rl-bg);
+    font-weight: 500;
+  }
+}
+
+.key {
+  display: flex;
+  gap: 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.mark {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--rl-text);
+  border-radius: 50%;
+}
+
+.mark-medication {
+  background: var(--rl-text);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 16px;
+  margin: 16px 0 0;
+  border-top: 1px solid var(--rl-line);
+
+  div {
+    padding: 12px 0;
+  }
+
+  dt {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--rl-text-2);
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-family: var(--rl-font-mono);
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 500;
+  }
+}
+
+.progress {
+  height: 10px;
+  margin-top: 12px;
+  border-radius: 5px;
+  background: var(--rl-tube);
+  overflow: hidden;
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--rl-text);
+}
+
+.section-title + .plain {
+  margin-top: 8px;
+}
+
+.note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.settings-link {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--rl-text);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

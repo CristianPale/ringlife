@@ -1,0 +1,308 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-section-gap);
+  padding: calc(var(--ion-safe-area-top, 0px) + 8px) var(--rl-gutter) 32px;
+  color: var(--rl-text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.date {
+  font-size: 15px;
+  color: var(--rl-text-2);
+}
+
+/* La frase della notte usa la voce (ADR 0020). */
+.lead {
+  margin: -12px 0 0;
+  font-family: var(--rl-font-voice);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.lead [data-tone='peggio'] {
+  color: var(--rl-warn);
+}
+
+.lead [data-tone='meglio'] {
+  color: var(--rl-ok-text);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: -4px;
+  padding: 14px 0 16px;
+  border-top: 1px solid var(--rl-line);
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.hero-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-title {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.reg-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.number {
+  font-family: var(--rl-font-mono);
+  font-size: 44px;
+  line-height: 44px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.of {
+  font-size: 15px;
+  color: var(--rl-text-2);
+}
+
+.verdict {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+.measures {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--rl-line);
+}
+
+.debt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  .section-title {
+    margin-bottom: 12px;
+  }
+}
+
+.debt-number {
+  font-family: var(--rl-font-mono);
+  font-size: 15px;
+}
+
+.glossary {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-text-2);
+
+  summary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    cursor: pointer;
+  }
+}
+
+.stages,
+.signals,
+.reg-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 8px;
+}
+
+.stage-name {
+  font-weight: 600;
+  color: var(--rl-text);
+}
+
+.full-name {
+  font-weight: 400;
+  color: var(--rl-text-2);
+}
+
+.stage-help {
+  color: var(--rl-text-2);
+}
+
+.note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.reg-number {
+  font-family: var(--rl-font-mono);
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.breath {
+  padding: 14px 16px;
+  border-radius: var(--rl-radius-card);
+  background: var(--rl-surface);
+
+  &[data-status='watch'] .breath-title {
+    color: var(--rl-warn);
+  }
+}
+
+.breath-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.breath-detail {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--rl-text-2);
+}
+
+.plain {
+  margin: 12px 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--rl-text-2);
+}
+
+.reg-facts {
+  margin-bottom: 16px;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--rl-radius-card);
+    background: var(--rl-surface);
+    font-size: 15px;
+    color: var(--rl-text-2);
+  }
+
+  strong {
+    flex-shrink: 0;
+    color: var(--rl-text);
+    font-family: var(--rl-font-mono);
+    font-weight: 500;
+  }
+
+  /* Senza un valore: una frase sotto l'etichetta, nella voce del testo e non in quella dei numeri. */
+  li.pending {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .why {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--rl-muted);
+  }
+}
+
+.formula {
+  padding: 4px 16px;
+  border-radius: var(--rl-radius-card);
+  background: var(--rl-surface);
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--rl-text-2);
+
+  summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--rl-text);
+    cursor: pointer;
+  }
+
+  ul {
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rl-line);
+  }
+
+  .version {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: var(--rl-muted);
+  }
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
+
+.sample-note {
+  margin: -12px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--rl-text-2);
+}

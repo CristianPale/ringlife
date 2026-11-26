@@ -1,0 +1,134 @@
+ion-content {
+  --background: var(--rl-bg);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px var(--rl-gutter) 40px;
+  color: var(--rl-text);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rl-text-2);
+}
+
+.value {
+  margin: 0;
+}
+
+.number {
+  font-family: var(--rl-font-mono);
+  font-size: 56px;
+  line-height: 64px;
+}
+
+.unit {
+  font-size: 20px;
+  color: var(--rl-text-2);
+}
+
+.when,
+.plain {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--rl-text-2);
+}
+
+.read {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--rl-muted);
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-family: var(--rl-font-voice);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: var(--rl-surface-2);
+
+  .line {
+    fill: none;
+    stroke: var(--rl-text);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .dot {
+    fill: var(--rl-text);
+  }
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: var(--rl-font-mono);
+  font-size: 12px;
+  color: var(--rl-muted);
+}
+
+.facts {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rl-line);
+    font-size: 15px;
+    color: var(--rl-text-2);
+  }
+
+  strong {
+    font-family: var(--rl-font-mono);
+    font-weight: 400;
+    color: var(--rl-text);
+  }
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--rl-text);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--rl-muted);
+}
